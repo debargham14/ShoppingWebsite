@@ -3,6 +3,7 @@ package com.debargha.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.debargha.model.Apparel;
 import com.debargha.model.ApparelDto;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequestMapping("admin")
 public class AdminController {
     private final UserService userService;
@@ -48,20 +49,29 @@ public class AdminController {
     }
 
     @GetMapping("/signup")
-    public String signupForm() {
-        return "signup";
+    public ModelAndView signupForm() {
+    	ModelAndView modelAndView = new ModelAndView();
+    	modelAndView.setViewName("signup");
+    	return modelAndView;
     }
 
     @PostMapping("/signup")
-    public String signup(@ModelAttribute("user") UserDto dto) {
-        if (userService.isRegistered(dto))
-            return "redirect:/admin/signup?error";
+    public ModelAndView signup(@ModelAttribute("user") UserDto dto) {
+        
+    	ModelAndView modelAndView = new ModelAndView();
+    	if (userService.isRegistered(dto)) {
+            //return "redirect:/admin/signup?error";
+    		modelAndView.setViewName("redirect:/admin/signup?error");
+    		return modelAndView;
+    	}
         userService.saveAdmin(dto);
-        return "redirect:/admin/signup?success";
+        modelAndView.setViewName("redirect:/admin/signup?success");
+        //return "redirect:/admin/signup?success";
+        return modelAndView;
     }
 
     @GetMapping("")
-    public String adminPanel(@RequestParam(required = false) String queryString, Model model) {
+    public ModelAndView adminPanel(@RequestParam(required = false) String queryString, Model model) {
       
     	if (queryString == null || queryString.isEmpty()) {
         	List<Apparel> apparelList = new ArrayList<Apparel>();
@@ -90,7 +100,9 @@ public class AdminController {
         		}
         	}
         	model.addAttribute("apparelList", apparelList);        }
-        return "admin";
+    	ModelAndView modelAndView = new ModelAndView();
+    	modelAndView.setViewName("admin");
+        return modelAndView;
     }
 
 }

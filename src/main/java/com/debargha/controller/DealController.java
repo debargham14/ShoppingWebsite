@@ -4,6 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.debargha.model.Deal;
 import com.debargha.model.DealDto;
@@ -11,7 +13,7 @@ import com.debargha.service.DealService;
 
 import java.time.LocalDateTime;
 
-@Controller
+@RestController
 @RequestMapping("/admin/deal")
 public class DealController {
     private final DealService dealService;
@@ -22,9 +24,10 @@ public class DealController {
     }
 
     @PostMapping("")
-    String createDeal(@ModelAttribute("deal") DealDto dto)
+    ModelAndView createDeal(@ModelAttribute("deal") DealDto dto)
     {
-        if(dto.getValidFrom() == null || dto.getValidFrom().isEmpty())
+        ModelAndView modelAndView = new ModelAndView();
+    	if(dto.getValidFrom() == null || dto.getValidFrom().isEmpty())
         {
             dto.setValidFrom(LocalDateTime.now().toString());
         }
@@ -32,9 +35,13 @@ public class DealController {
         Deal deal = dealService.save(dto);
         if(deal == null)
         {
-            return "redirect:/admin?dealError";
+            //return "redirect:/admin?dealError";
+        	modelAndView.setViewName("redirect:/admin?dealError");
+    		return modelAndView;
         }
-        return "redirect:/admin?dealSuccess";
+        //return "redirect:/admin?dealSuccess";
+        modelAndView.setViewName("redirect:/admin?dealSuccess");
+		return modelAndView;
     }
 
 

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.debargha.model.Apparel;
 import com.debargha.model.ApparelDto;
@@ -23,7 +25,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 
-@Controller
+@RestController
 public class MainController {
     private final ApparelService apparelService;
     private final DealService dealService;
@@ -36,7 +38,7 @@ public class MainController {
     }
 
     @GetMapping("/user")
-    public String home(@RequestParam(required = false) String q, Authentication auth, Model model, HttpSession session) {
+    public ModelAndView home(@RequestParam(required = false) String q, Authentication auth, Model model, HttpSession session) {
         Statistics statistics = (Statistics) session.getAttribute("statistics");
         User user = (User) auth.getPrincipal();
 
@@ -72,7 +74,10 @@ public class MainController {
         	}
             model.addAttribute("apparelList", sortAccordingToMetric(apparelList, statistics));
         }
-        return "index";
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index");
+        //return "index";
+        return modelAndView;
     }
 
     private List<ApparelDto> sortAccordingToMetric(List<ApparelDto> apparels, Statistics statistics) {
